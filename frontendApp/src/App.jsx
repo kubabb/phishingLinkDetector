@@ -4,85 +4,94 @@ import URLInput from './components/URLInput';
 import LoadingAnimation from './components/LoadingAnimation';
 import ResultCard from './components/ResultCard';
 import ErrorMessage from './components/ErrorMessage';
+import Footer from './components/Footer';
 import { usePhishingScan } from './hooks/usePhishingScan';
+
+const springTransition = { type: 'spring', stiffness: 300, damping: 25 };
 
 function App() {
   const { result, isLoading, error, analyzeUrl, reset } = usePhishingScan();
 
-  const handleScan = async (url) => {
-    await analyzeUrl(url);
-  };
-
-  const handleReset = () => {
-    reset();
-  };
-
   return (
-    <div className="min-h-screen animated-bg">
-      {/* Background decorative elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
-      </div>
+    <div className="min-h-screen flex flex-col bg-zinc-950">
+      <div className="fixed inset-0 z-0 grid-texture" />
+      <div className="grain-overlay" />
 
-      {/* Main content */}
-      <div className="relative z-10 py-12 px-4">
-        {/* Hero Section */}
-        <HeroSection />
+      <main className="relative z-10 flex-grow flex flex-col items-center justify-center px-8 py-32">
+        <div className="w-full max-w-7xl flex flex-col items-center gap-32 md:gap-48">
+          <HeroSection />
 
-        {/* URL Input or Reset Button */}
-        {!result && !error && (
-          <URLInput onScan={handleScan} isLoading={isLoading} />
-        )}
-
-        {/* Loading Animation */}
-        <AnimatePresence mode="wait">
-          {isLoading && <LoadingAnimation key="loading" />}
-        </AnimatePresence>
-
-        {/* Result Card */}
-        <AnimatePresence mode="wait">
-          {result && !isLoading && (
-            <div key="result">
-              <ResultCard result={result} />
-              {/* Scan Another Button */}
+          <AnimatePresence mode="wait">
+            {!result && !error && (
               <motion.div
-                className="w-full max-w-3xl mx-auto px-4 mt-6"
-                initial={{ opacity: 0, y: 20 }}
+                key="input"
+                className="w-full"
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.2 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 25 }}
               >
+                <URLInput onScan={analyzeUrl} isLoading={isLoading} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            {isLoading && (
+              <motion.div
+                key="loading"
+                className="w-full"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={springTransition}
+              >
+                <LoadingAnimation />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence mode="wait">
+            {result && !isLoading && (
+              <motion.div
+                key="result"
+                className="w-full max-w-5xl"
+                initial={{ opacity: 0, y: 32, scale: 0.99 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={springTransition}
+              >
+                <ResultCard result={result} />
                 <motion.button
-                  onClick={handleReset}
-                  className="w-full py-4 glass hover:glass-light rounded-xl text-slate-300 font-medium transition-all duration-300"
+                  onClick={reset}
+                  className="w-full mt-10 py-6 text-xl text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-[0.2em]"
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  Skanuj kolejny URL
+                  Scan another URL
                 </motion.button>
               </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
 
-        {/* Error Message */}
-        <AnimatePresence mode="wait">
-          {error && !isLoading && (
-            <ErrorMessage key="error" error={error} onRetry={handleReset} />
-          )}
-        </AnimatePresence>
+          <AnimatePresence mode="wait">
+            {error && !isLoading && (
+              <motion.div
+                key="error"
+                className="w-full max-w-3xl"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={springTransition}
+              >
+                <ErrorMessage error={error} onRetry={reset} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </main>
 
-        {/* Footer */}
-        <motion.footer
-          className="mt-16 text-center text-slate-500 text-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
-          <p>Phishing Detector v1.0 - Ensemble ML (Random Forest + XGBoost + Gradient Boosting)</p>
-          <p className="mt-1">Dokładność modelu &gt; 95%</p>
-        </motion.footer>
-      </div>
+      <Footer />
     </div>
   );
 }

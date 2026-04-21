@@ -269,18 +269,155 @@ pip install pandas numpy scikit-learn xgboost
 
 ---
 
-## 📁 Struktura Plikow
+## 🌐 Frontend (React + Vite)
+
+### Stack Technologiczny
+
+| Technologia | Wersja | Zastosowanie |
+|------------|--------|--------------|
+| React | 19.x | Biblioteka UI |
+| Vite | 8.x | Bundler i dev server |
+| Tailwind CSS | 4.x | Stylowanie (glassmorphism, gradienty) |
+| Framer Motion | 12.x | Animacje i przejścia |
+| Lucide React | 1.x | Ikony (Shield, Scan, AlertTriangle, itp.) |
+| Axios | 1.x | Komunikacja HTTP z backendem |
+
+### Struktura Projektu Frontend
+
+```
+frontendApp/
+├── src/
+│   ├── api/
+│   │   ├── index.js             # Eksport funkcji API
+│   │   └── phishingService.js   # Komunikacja z backendem FastAPI
+│   ├── components/
+│   │   ├── HeroSection.jsx      # Nagłówek z tytułem i opisem
+│   │   ├── URLInput.jsx         # Pole tekstowe + przycisk "Skanuj"
+│   │   ├── LoadingAnimation.jsx # Animacja ładowania podczas analizy
+│   │   ├── ResultCard.jsx       # Karta wyników z werdyktem
+│   │   ├── RiskMeter.jsx        # Circular progress (nie używany w obecnej wersji)
+│   │   ├── AccordionItem.jsx    # Rozwijane sekcje
+│   │   └── ErrorMessage.jsx     # Komunikat błędu
+│   ├── hooks/
+│   │   └── usePhishingScan.js   # Hook do zarządzania stanem skanowania
+│   ├── App.jsx                  # Główny komponent
+│   ├── main.jsx                 # Punkt wejścia React
+│   └── index.css                # Style globalne + Tailwind
+├── .env                         # Zmienne środowiskowe
+├── vite.config.js               # Konfiguracja Vite
+└── package.json
+```
+
+### Główne Komponenty Interfejsu
+
+#### HeroSection
+- Ikona tarczy z animacją pulse-glow
+- Tytuł "Phishing Detector" z gradientem tekstowym
+- Opis narzędzia
+- Lista funkcji (Ensemble ML, 111 cech, dokładność >95%)
+
+#### URLInput
+- Duże pole tekstowe z ikoną Link2
+- Przycisk "Skanuj" z gradientem indigo-purple
+- Obsługa stanu ładowania (animacja obracającego się koła)
+- Przycisk czyszczenia (X) gdy input ma wartość
+
+#### LoadingAnimation
+- Animacja skanowania z paskiem postępu
+- Kolejne kroki: Ekstrakcja cech → Analiza domeny → Weryfikacja HTTPS → Predykcja
+- Efekt "scan line" przesuwający się przez kartę
+
+#### ResultCard
+- Nagłówek z werdyktem (ZAGROŻENIE PHISHINGIEM / BEZPIECZNY)
+- Analizowany URL
+- Poziom ryzyka z odpowiednią ikoną
+- Paski postępu dla prawdopodobieństwa scamu/bezpiecznej
+- Predykcje poszczególnych modeli ensemble
+- Lista powodów klasyfikacji (jeśli dostępne)
+
+#### ErrorMessage
+- Ikona błędu
+- Komunikat opisujący problem
+- Przycisk "Spróbuj ponownie"
+
+### Konfiguracja Komunikacji z Backendem
+
+#### Zmienna Środowiskowa
+```bash
+# Plik .env
+VITE_API_URL=https://your-phishing-api.onrender.com
+```
+
+#### API Service (phishingService.js)
+```javascript
+const API_URL = import.meta.env.VITE_API_URL || 'https://your-phishing-api.onrender.com';
+
+export const scanUrl = async (url) => {
+  const response = await axios.post(`${API_URL}/predict`, { url });
+  return response.data;
+};
+```
+
+#### Oczekiwany Format Odpowiedzi API
+```json
+{
+  "url": "https://example.com",
+  "is_scam": true,
+  "scam_probability": 87.45,
+  "legitimate_probability": 12.55,
+  "risk_level": "WYSOKIE",
+  "reasons": ["Brak HTTPS", "Podejrzane TLD", ...],
+  "model_predictions": {
+    "rf": 89.2,
+    "xgb": 85.1,
+    "gb": 88.0
+  }
+}
+```
+
+### Uruchomienie Frontendu
+
+```bash
+cd frontendApp
+npm install
+npm run dev
+```
+
+Dostępne skrypty:
+- `npm run dev` - uruchomienie development server (port 5173)
+- `npm run build` - budowanie wersji produkcyjnej
+- `npm run preview` - podgląd wersji produkcyjnej
+
+### Deployment
+Wersja produkcyjna znajduje się w folderze `dist/`. Może być wdrożona na:
+- Vercel
+- Netlify
+- GitHub Pages
+- Dowolny static hosting
+
+---
+
+## 📁 Struktura Plikow (Aktualizacja)
 
 ```
 project/
+├── dataset_phishing.csv       # Zbior treningowy (111 cech + etykiety)
+├── phishing_detector.py       # Glowny skrypt - trening i klasa PhishingDetector
+├── phishing_api.py            # Interfejs CLI/API do sprawdzania URL
+├── phishing_model.pkl         # Wytrenowany model (generowany)
+├── PROJEKT_SPECYFIKACJA.md    # Dokumentacja projektu
 │
-├── dataset_phishing.csv      # Zbior treningowy (111 cech + etykiety)
-├── phishing_detector.py      # Glowny skrypt - trening i klasa PhishingDetector
-├── phishing_api.py           # Interfejs CLI/API do sprawdzania URL
-├── phishing_model.pkl        # Wytrenowany model (generowany)
-├── PROJEKT_SPECYFIKACJA.md   # Ten plik - dokumentacja projektu
+├── frontendApp/               # ← NOWE: Frontend React + Vite
+│   ├── src/
+│   │   ├── api/               # Integracja z backendem
+│   │   ├── components/        # Komponenty UI
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── App.jsx            # Glowny komponent
+│   │   └── index.css          # Style + Tailwind
+│   ├── .env                   # VITE_API_URL
+│   └── vite.config.js
 │
-└── README.md                 # Instrukcja uzycia (opcjonalnie)
+└── README.md
 ```
 
 ---
@@ -328,6 +465,6 @@ project/
 
 ---
 
-**Autor:** AI Assistant (Kimi K2.5)  
-**Licencja:** MIT  
-**Ostatnia aktualizacja:** 2025-04-21
+**Autor:** AI Assistant (Kimi K2.5) 
+**Licencja:** MIT
+**Ostatnia aktualizacja:** 2025-04-21 (dodano sekcję Frontend)

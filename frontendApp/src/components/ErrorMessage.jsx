@@ -4,34 +4,27 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 const ErrorMessage = ({ error, onRetry }) => {
   return (
     <motion.div
-      className="w-full max-w-2xl mx-auto px-4"
-      initial={{ opacity: 0, y: 20 }}
+      className="w-full"
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
     >
-      <div className="glass rounded-2xl p-6 border border-red-500/30">
-        <div className="flex flex-col items-center text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          >
-            <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
-          </motion.div>
-
-          <h3 className="text-lg font-semibold text-white mb-2">Wystąpił błąd</h3>
-
-          <p className="text-slate-400 mb-6">{error}</p>
-
+      <div className="border border-red-500/30 rounded-2xl bg-red-950/10 overflow-hidden">
+        <div className="px-8 py-6 flex items-center gap-4 border-b border-zinc-800">
+          <AlertCircle className="w-7 h-7 text-red-500" strokeWidth={1.5} />
+          <span className="text-xl font-semibold text-red-400">Analysis Failed</span>
+        </div>
+        <div className="px-8 py-6">
+          <p className="text-lg text-zinc-400 mb-6">{error}</p>
           {onRetry && (
             <motion.button
               onClick={onRetry}
-              className="flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-white transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center gap-2 px-6 py-3 text-base font-medium text-zinc-300 border border-zinc-700 rounded-xl hover:border-zinc-600 hover:text-zinc-100 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.99 }}
             >
-              <RefreshCw className="w-4 h-4" />
-              <span>Spróbuj ponownie</span>
+              <RefreshCw className="w-5 h-5" />
+              Retry
             </motion.button>
           )}
         </div>

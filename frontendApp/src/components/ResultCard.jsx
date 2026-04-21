@@ -1,12 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import {
-  AlertTriangle,
-  CheckCircle,
-  AlertCircle,
-  Info,
-  XCircle,
-} from 'lucide-react';
+import { CheckCircle, XCircle, ChevronRight } from 'lucide-react';
+
+const modelLabels = { rf: 'Random Forest', xgb: 'XGBoost', gb: 'Gradient Boosting' };
 
 const ResultCard = ({ result }) => {
   const {
@@ -19,193 +14,100 @@ const ResultCard = ({ result }) => {
     model_predictions = {},
   } = result;
 
-  const isDanger = is_scam;
-  const icon = isDanger ? XCircle : CheckCircle;
-  const iconColor = isDanger ? 'text-red-500' : 'text-green-500';
-  const verdictBg = isDanger
-    ? 'from-red-500/20 to-red-600/10'
-    : 'from-green-500/20 to-green-600/10';
-  const verdictBorder = isDanger ? 'border-red-500/50' : 'border-green-500/50';
-  const verdictText = isDanger ? 'text-red-400' : 'text-green-400';
-  const verdict = isDanger ? 'ZAGROŻENIE PHISHINGIEM' : 'BEZPIECZNY';
-
-  const RiskIcon = () => {
-    switch (risk_level) {
-      case 'BARDZO NISKIE':
-        return <Info className="w-5 h-5 text-blue-400" />;
-      case 'NISKIE':
-        return <CheckCircle className="w-5 h-5 text-green-400" />;
-      case 'SREDNIE':
-        return <AlertCircle className="w-5 h-5 text-yellow-400" />;
-      case 'WYSOKIE':
-        return <AlertTriangle className="w-5 h-5 text-orange-400" />;
-      case 'BARDZO WYSOKIE':
-        return <XCircle className="w-5 h-5 text-red-400" />;
-      default:
-        return <AlertCircle className="w-5 h-5 text-slate-400" />;
-    }
-  };
+  const totalSegments = 20;
+  const filledSegments = Math.round((scam_probability / 100) * totalSegments);
 
   return (
     <motion.div
-      className="w-full max-w-3xl mx-auto px-4"
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full"
+      initial={{ opacity: 0, y: 32, scale: 0.99 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ type: 'spring', stiffness: 250, damping: 25 }}
     >
-      <div className="glass rounded-3xl overflow-hidden">
-        {/* Header with verdict */}
-        <motion.div
-          className={`bg-gradient-to-r ${verdictBg} p-6 border-b ${verdictBorder}`}
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="flex items-center justify-center gap-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.4 }}
-            >
-              {React.createElement(icon, { className: `w-12 h-12 ${iconColor}` })}
-            </motion.div>
-            <motion.h2
-              className={`text-2xl md:text-3xl font-bold ${verdictText}`}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              {verdict}
-            </motion.h2>
+      <div className="border border-zinc-800 rounded-2xl bg-zinc-900/60 overflow-hidden">
+        <div className={`px-8 py-6 border-b border-zinc-800 flex items-center justify-between ${is_scam ? 'bg-red-950/20' : 'bg-emerald-950/20'}`}>
+          <div className="flex items-center gap-4">
+            {is_scam
+              ? <XCircle className="w-8 h-8 text-red-500" strokeWidth={1.5} />
+              : <CheckCircle className="w-8 h-8 text-emerald-500" strokeWidth={1.5} />
+            }
+            <span className={`text-2xl font-bold ${is_scam ? 'text-red-400' : 'text-emerald-400'}`}>
+              {is_scam ? 'Threat Detected' : 'Safe'}
+            </span>
           </div>
-        </motion.div>
+          <span className="text-lg text-zinc-500 font-mono">{risk_level}</span>
+        </div>
 
-        {/* URL */}
-        <motion.div
-          className="px-6 py-4 border-b border-slate-700/30"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-        >
-          <div className="flex items-center gap-2 text-sm text-slate-400 mb-1">
-            <span>Analizowany URL:</span>
-          </div>
-          <div className="font-mono text-sm text-slate-200 break-all bg-slate-800/30 p-3 rounded-lg">
-            {url}
-          </div>
-        </motion.div>
+        <div className="px-8 py-6 border-b border-zinc-800">
+          <p className="text-sm text-zinc-600 mb-3 uppercase tracking-wider">Analyzed URL</p>
+          <p className="text-xl text-zinc-200 font-mono break-all">{url}</p>
+        </div>
 
-        {/* Risk Level and Probability */}
-        <motion.div
-          className="p-6 grid md:grid-cols-2 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-        >
-          {/* Risk Level Badge */}
-          <div className="flex flex-col items-center justify-center p-6 glass-light rounded-2xl">
-            <div className="flex items-center gap-2 mb-2">
-              <RiskIcon />
-              <span className="text-slate-400 text-sm uppercase tracking-wider">
-                Poziom ryzyka
-              </span>
-            </div>
-            <span className="text-xl font-bold text-white">{risk_level}</span>
+        <div className="px-8 py-6 border-b border-zinc-800">
+          <div className="flex items-center justify-between mb-5">
+            <p className="text-base text-zinc-500 uppercase tracking-wider">Risk Score</p>
+            <p className={`text-2xl font-bold font-mono ${is_scam ? 'text-red-500' : 'text-emerald-500'}`}>
+              {scam_probability?.toFixed(1)}%
+            </p>
           </div>
-
-          {/* Probability breakdown */}
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-red-400">Prawdopodobieństwo scamu</span>
-                <span className="font-semibold text-red-400">
-                  {scam_probability?.toFixed(2)}%
-                </span>
-              </div>
-              <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${scam_probability}%` }}
-                  transition={{ duration: 1, delay: 0.9, ease: 'easeOut' }}
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-green-400">Prawdopodobieństwo bezpiecznej</span>
-                <span className="font-semibold text-green-400">
-                  {legitimate_probability?.toFixed(2)}%
-                </span>
-              </div>
-              <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${legitimate_probability}%` }}
-                  transition={{ duration: 1, delay: 1, ease: 'easeOut' }}
-                />
-              </div>
-            </div>
+          <div className="flex gap-2">
+            {Array.from({ length: totalSegments }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-4 flex-1 rounded transition-colors ${
+                  i < filledSegments
+                    ? is_scam ? 'bg-red-500' : 'bg-emerald-500'
+                    : 'bg-zinc-800'
+                }`}
+              />
+            ))}
           </div>
-        </motion.div>
+          <div className="flex justify-between mt-5 text-base">
+            <span className="text-zinc-400">Scam: {scam_probability?.toFixed(2)}%</span>
+            <span className="text-zinc-400">Legitimate: {legitimate_probability?.toFixed(2)}%</span>
+          </div>
+        </div>
 
-        {/* Model Predictions */}
         {model_predictions && Object.keys(model_predictions).length > 0 && (
-          <motion.div
-            className="px-6 pb-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            <div className="p-4 glass-light rounded-xl">
-              <h4 className="text-sm text-slate-400 uppercase tracking-wider mb-3">
-                Predykcje modeli ensemble
-              </h4>
-              <div className="grid grid-cols-3 gap-3">
-                {Object.entries(model_predictions).map(([model, value]) => (
-                  <div key={model} className="text-center p-3 bg-slate-800/30 rounded-lg">
-                    <div className="text-xs text-slate-400 uppercase mb-1">
-                      {model === 'rf' ? 'Random Forest' : model === 'xgb' ? 'XGBoost' : 'Gradient Boosting'}
+          <div className="px-8 py-6 border-b border-zinc-800">
+            <p className="text-base text-zinc-500 uppercase tracking-wider mb-5">Ensemble Predictions</p>
+            <div className="space-y-4">
+              {Object.entries(model_predictions).map(([model, value]) => {
+                const predValue = typeof value === 'number' ? value : parseFloat(value);
+                const predFilled = Math.round((predValue / 100) * 10);
+                return (
+                  <div key={model} className="flex items-center gap-4">
+                    <span className="text-base text-zinc-500 w-40 font-mono">{modelLabels[model] || model}</span>
+                    <div className="flex-1 flex gap-1">
+                      {Array.from({ length: 10 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-3 flex-1 rounded-sm ${
+                            i < predFilled ? 'bg-indigo-500/70' : 'bg-zinc-800'
+                          }`}
+                        />
+                      ))}
                     </div>
-                    <div className="text-lg font-bold text-white">
-                      {typeof value === 'number' ? value.toFixed(1) : value}%
-                    </div>
+                    <span className="text-lg text-zinc-300 font-mono w-16 text-right">{predValue.toFixed(1)}%</span>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
-          </motion.div>
+          </div>
         )}
 
-        {/* Reasons - if available */}
-        {reasons && reasons.length > 0 && (
-          <motion.div
-            className="px-6 pb-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-          >
-            <div className="p-4 glass-light rounded-xl">
-              <h4 className="text-sm text-slate-400 uppercase tracking-wider mb-3">
-                Powody klasyfikacji
-              </h4>
-              <ul className="space-y-2">
-                {reasons.map((reason, index) => (
-                  <motion.li
-                    key={index}
-                    className="flex items-start gap-2 text-sm text-slate-300"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 1 + index * 0.05 }}
-                  >
-                    <AlertTriangle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
-                    <span>{reason}</span>
-                  </motion.li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
+        {reasons?.length > 0 && (
+          <div className="px-8 py-6">
+            <p className="text-base text-zinc-500 uppercase tracking-wider mb-4">Detection Flags</p>
+            <ul className="space-y-3">
+              {reasons.map((reason, index) => (
+                <li key={index} className="flex items-start gap-3 text-lg text-zinc-400">
+                  <ChevronRight className="w-5 h-5 text-zinc-600 mt-0.5 flex-shrink-0" />
+                  <span>{reason}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </motion.div>

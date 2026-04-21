@@ -8,7 +8,7 @@ export const usePhishingScan = () => {
 
   const analyzeUrl = useCallback(async (url) => {
     if (!url || !url.trim()) {
-      setError('Proszę podać adres URL do analizy.');
+      setError('Please enter a URL to analyze.');
       return null;
     }
 
@@ -26,7 +26,7 @@ export const usePhishingScan = () => {
       setResult(scanResult);
       return scanResult;
     } catch (err) {
-      setError(err.message || 'Wystąpił błąd podczas analizy.');
+      setError(err.message || 'An error occurred during analysis.');
       return null;
     } finally {
       setIsLoading(false);

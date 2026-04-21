@@ -1,93 +1,43 @@
 import { motion } from 'framer-motion';
-import { Shield, Activity, Eye, Brain } from 'lucide-react';
-
-const scanningSteps = [
-  { icon: Shield, text: 'Ekstrakcja cech URL...', duration: 800 },
-  { icon: Activity, text: 'Analiza struktury domeny...', duration: 600 },
-  { icon: Eye, text: 'Weryfikacja certyfikatu HTTPS...', duration: 700 },
-  { icon: Brain, text: 'Ensemble predykcja (RF + XGB + GB)...', duration: 1000 },
-];
+import { Shield } from 'lucide-react';
 
 const LoadingAnimation = () => {
   return (
     <motion.div
-      className="w-full max-w-xl mx-auto px-4 py-12"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.3 }}
+      className="w-full"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
     >
-      <div className="glass rounded-3xl p-8 relative overflow-hidden">
-        {/* Scan line effect */}
-        <div className="absolute inset-0 scan-line pointer-events-none" />
-
-        {/* Header */}
-        <div className="text-center mb-8">
+      <div className="border border-zinc-800 rounded-2xl bg-zinc-900/60 overflow-hidden">
+        <div className="px-8 py-6 border-b border-zinc-800 flex items-center gap-5">
           <motion.div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 mb-4"
-            animate={{
-              boxShadow: [
-                '0 0 20px rgba(99, 102, 241, 0.3)',
-                '0 0 40px rgba(99, 102, 241, 0.6)',
-                '0 0 20px rgba(99, 102, 241, 0.3)',
-              ],
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
+            className="w-14 h-14 rounded-xl border border-zinc-800 bg-zinc-900/80 flex items-center justify-center"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <Shield className="w-8 h-8 text-white" />
+            <Shield className="w-7 h-7 text-indigo-400" strokeWidth={1.5} />
           </motion.div>
-          <h3 className="text-xl font-semibold text-white mb-2">Trwa analiza URL</h3>
-          <p className="text-slate-400 text-sm">System ML analizuje 111 cech...</p>
-        </div>
-
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-              initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{ duration: 3, ease: 'easeInOut' }}
-            />
+          <div>
+            <p className="text-2xl font-semibold text-zinc-100">Analyzing URL</p>
+            <p className="text-lg text-zinc-500 font-mono">Extracting 111 features...</p>
           </div>
         </div>
 
-        {/* Scanning steps */}
-        <div className="space-y-3">
-          {scanningSteps.map(({ icon: Icon, text, duration }, index) => (
+        <div className="px-8 py-6">
+          <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
             <motion.div
-              key={text}
-              className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/30"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.5, duration: 0.3 }}
-            >
-              <motion.div
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20"
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 1, repeat: Infinity, delay: index * 0.2 }}
-              >
-                <Icon className="w-4 h-4 text-indigo-400" />
-              </motion.div>
-              <span className="text-slate-300 text-sm">{text}</span>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Random dots animation */}
-        <div className="absolute bottom-4 right-4 flex gap-1">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-2 h-2 rounded-full bg-indigo-400"
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
+              className="h-full bg-indigo-500 rounded-full"
+              initial={{ width: '0%', opacity: 0 }}
+              animate={{ width: '100%', opacity: 1 }}
+              transition={{ duration: 2.5, ease: 'easeInOut' }}
             />
-          ))}
+          </div>
+          <div className="flex justify-between mt-4">
+            <p className="text-base text-zinc-600 font-mono">feature_extraction</p>
+            <p className="text-base text-zinc-600 font-mono">domain_analysis</p>
+            <p className="text-base text-zinc-600 font-mono">ensemble</p>
+          </div>
         </div>
       </div>
     </motion.div>

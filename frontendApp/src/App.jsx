@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import HeroSection from './components/HeroSection';
 import URLInput from './components/URLInput';
 import LoadingAnimation from './components/LoadingAnimation';

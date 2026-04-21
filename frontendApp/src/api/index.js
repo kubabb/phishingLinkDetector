@@ -1,0 +1,1 @@
+export { scanUrl, getApiHealth } from './phishingService';
